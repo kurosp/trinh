@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>by Btoan😼</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            text-align: center;
+            padding: 20px;
+        }
+        .ascii-art {
+            white-space: pre;
+            font-family: monospace;
+            font-size: 6px;
+            line-height: 5px;
+        }
+        canvas {
+            display: none; /* Ẩn canvas */
+        }
+    </style>
+</head>
+<body>
+    <div id="asciiContainer" class="ascii-art"></div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const asciiContainer = document.getElementById('asciiContainer');
+
+        // Bộ ký tự cho ASCII art
+        const grayScaleChars = [".", ":", "U", "u", "A", "a", "o", "i", "l", "=", "*", "#", "%", "@"];
+
+        window.onload = function () {
+            const img = new Image();
+            img.src = 'nhu.png'; // Đường dẫn tới ảnh cố định
+            img.onload = function () {
+                const width = 350; // Độ rộng ASCII art
+                const height = (img.height / img.width) * width;
+
+                canvas.width = width;
+                canvas.height = height;
+
+                ctx.drawImage(img, 0, 0, width, height);
+                const imageData = ctx.getImageData(0, 0, width, height);
+                const asciiArt = convertToAscii(imageData);
+                asciiContainer.innerHTML = asciiArt;
+            };
+        };
+
+        function convertToAscii(imageData) {
+            let ascii = '';
+            const data = imageData.data;
+
+            for (let y = 0; y < imageData.height; y++) {
+                for (let x = 0; x < imageData.width; x++) {
+                    const index = (y * imageData.width + x) * 4;
+                    const r = data[index];
+                    const g = data[index + 1];
+                    const b = data[index + 2];
+
+                    // Chuyển đổi pixel sang độ sáng
+                    const brightness = (r + g + b) / 3;
+                    const charIndex = Math.floor((brightness / 255) * (grayScaleChars.length - 1));
+                    const char = grayScaleChars[charIndex];
+
+                    // Tạo màu cho ký tự
+                    ascii += `<span style="color: rgb(${r}, ${g}, ${b})">${char}</span>`;
+                }
+                ascii += '<br>';
+            }
+
+            return ascii;
+        }
+    </script>
+</body>
+</html>
